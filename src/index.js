@@ -10,6 +10,8 @@ class Game extends React.Component {
             history: [{
                 squares: Array(9).fill(null),
             }],
+            prevStep: null,
+            coordsMoveArr: ['0/0'],
             stepNumber: 0,
             xIsNext: true,
         }
@@ -19,14 +21,23 @@ class Game extends React.Component {
         const history = this.state.history.slice(0, this.state.stepNumber + 1)
         const current = history[history.length - 1]
         const squares = current.squares.slice()
+
+        const coordsMoveArr = this.state.coordsMoveArr.slice()
+        coordsMoveArr.push(this.coordStep(i))
+
         if (this.calculateWinner(squares) || squares[i]) {
             return
         }
+
         squares[i] = this.state.xIsNext ? 'X' : 'O'
+
+
         this.setState({
             history: history.concat([{
                 squares
             }]),
+            prevStep: i,
+            coordsMoveArr: coordsMoveArr,
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
         })
@@ -39,6 +50,23 @@ class Game extends React.Component {
         })
     }
 
+    coordStep(prevStep) {
+        let xCord = 0, yCord = 0
+
+        if (prevStep < 3) {
+            xCord = 1
+            yCord = prevStep + 1
+        } else if (prevStep < 6) {
+            xCord = 2
+            yCord = prevStep -3 + 1
+        } else {
+            xCord = 3
+            yCord = prevStep -6 + 1
+        }
+
+        return (xCord + '/' + yCord).toString()
+    }
+
     render() {
         const history = this.state.history
         const current = history[this.state.stepNumber]
@@ -46,7 +74,8 @@ class Game extends React.Component {
 
         const moves = history.map((step, move) => {
             const desc = move ?
-            'Перейти к ходу №' + move :
+            'Перейти к ходу №' + move + 
+            ' (' + this.state.coordsMoveArr[move] + ')':
             'К началу игры'
             return (
                 <li key={move}>
