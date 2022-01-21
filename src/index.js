@@ -12,6 +12,7 @@ class Game extends React.Component {
             }],
             prevStep: null,
             coordsMoveArr: ['0/0'],
+            winnerLine: [],
             stepNumber: 0,
             xIsNext: true,
         }
@@ -96,7 +97,9 @@ class Game extends React.Component {
         let status
 
         if (winner) {
-            status = 'Выиграл ' + winner
+            status = 'Выиграл ' + winner[0]
+            this.state.winnerLine = [winner[1],winner[2],winner[3]]
+
         } else {
             status = 'Следующий ход ' + (this.state.xIsNext ? 'X' : 'O')
         }
@@ -105,6 +108,7 @@ class Game extends React.Component {
         <div className="game">
             <div className="game-board">
                 <Board 
+                    winnerLine={this.state.winnerLine}
                     squares={current.squares}
                     onClick={(i) => this.handleClick(i)}
                 />
@@ -132,7 +136,7 @@ class Game extends React.Component {
         for (let i = 0; i < lines.length; i++) {
             const [a, b, c] = lines[i];
             if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-                return squares[a]
+                return [squares[a], a,b,c]
             }
         }
         return null

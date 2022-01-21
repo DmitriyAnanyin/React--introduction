@@ -4,10 +4,19 @@ import Square from './Square'
 export default class Board extends React.Component {
     
     renderSquare(i) {
+        let isActive = false
+        let winnerLine = this.props.winnerLine
+        
+        winnerLine.forEach(winnerItem => {
+            if (i === winnerItem) {
+                isActive = true
+            }
+        });
 
         return (
             <Square 
                 key={i} 
+                isActive={isActive}
                 value={this.props.squares[i]} 
                 onClick={() => this.props.onClick(i)} 
             />
