@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Board from './components/Board';
+import MoveList from './components/MoveList';
 
 class Game extends React.Component {
     constructor(props) {
@@ -15,6 +16,7 @@ class Game extends React.Component {
             winnerLine: [],
             stepNumber: 0,
             xIsNext: true,
+            sortMoveListClass: '',
         }
     }
 
@@ -44,13 +46,6 @@ class Game extends React.Component {
         })
     }
 
-    jumpTo(step) {
-        this.setState({
-            stepNumber: step,
-            xIsNext: (step % 2) === 0,
-        })
-    }
-
     coordStep(prevStep) {
         let xCord = 0, yCord = 0
 
@@ -72,28 +67,7 @@ class Game extends React.Component {
         const history = this.state.history
         const current = history[this.state.stepNumber]
         const winner = this.calculateWinner(current.squares)
-
-        const moves = history.map((step, move) => {
-            const desc = move ?
-            'Перейти к ходу №' + move + 
-            ' (' + this.state.coordsMoveArr[move] + ')':
-            'К началу игры'
-
-            let className
-
-            if (this.state.stepNumber === move) {
-                className = 'active'
-            }
-
-            return (
-                <li key={move}>
-                    <button className={className} onClick={() => this.jumpTo(move)}>
-                        {desc}
-                    </button>
-                </li>
-            )
-        })
-
+        const className = this.state.sortMoveListClass
         let status
 
         if (winner) {
@@ -105,7 +79,7 @@ class Game extends React.Component {
         } else {
             status = 'Следующий ход ' + (this.state.xIsNext ? 'X' : 'O')
         }
-
+        
         return (
         <div className="game">
             <div className="game-board">
@@ -117,7 +91,29 @@ class Game extends React.Component {
             </div>
             <div className="game-info">
                 <div>{status}</div>
-                <ol>{moves}</ol>
+                <button 
+                    onClick={() => {
+                        if (className === '') {
+                            this.setState({sortMoveListClass: 'sort-down'})
+                        } else {
+                            this.setState({sortMoveListClass: ''})
+                        }
+                    }}
+                >
+                Сортировать
+                </button>
+                <ol className={className}>
+                    <MoveList
+                        state={this.state}
+                        setState={(object) => {
+                            this.setState({
+                                stepNumber: object.stepNumber,
+                                xIsNext: object.xIsNext,
+                                winnerLine: object.winnerLine
+                            })
+                        }}
+                    />
+                </ol>
             </div>
         </div>
         );
